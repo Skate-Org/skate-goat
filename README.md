@@ -1,4 +1,4 @@
-# Skate AMM Agent <> Goat SDK
+# Skate AMM Agent <> Goat SDK MCP Server
 
 ## Dependencies
 1. model context protocol
