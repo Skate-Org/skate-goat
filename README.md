@@ -32,3 +32,6 @@ npm run build
 "CHAIN": "..."
 # Corresponding chain ID for the chain to use for transactions (e.g. 42161, 8453 etc.)
 ```
+
+## Demo
+![demo-image](docs/images/skate-goat.png)
