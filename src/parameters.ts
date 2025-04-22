@@ -17,7 +17,7 @@ export class UserWalletParameters extends createToolParameters(
 
 export class SwapQuoteParameters extends createToolParameters(
     z.object({
-        amountIn: z.string().describe("Amount of tokens to swap as string, pre parseUnits format"), 
+        amountIn: z.string().describe("Amount of tokens to swap as string, pre parseUnits format"),
         srcChainId: z.nativeEnum(CHAIN).describe("Chain to swap from"),
         peripheryPoolAddress: z.string().describe("Address of the periphery pool"),
         tokenAddressIn: z.string().describe("Symbol of the token to swap from (e.g., USDC)"),
@@ -25,28 +25,28 @@ export class SwapQuoteParameters extends createToolParameters(
         tokenAddressOut: z.string().describe("Symbol of the token to swap to (e.g., WETH)"),
         userAddress: z.string().describe("Address of the user"),
         chains: z.array(z.nativeEnum(CHAIN)).describe("Chains to check for the swap (e.g., ARBITRUM, BASE)"),
-        slippageLimit: z.number().optional().describe("Maximum slippage allowed for the swap (e.g., 0.5 for 0.5%)")
+        slippageLimit: z.number().optional().describe("Maximum slippage allowed for the swap (e.g., 0.01 for 1%)"),
     }),
 ) {}
 
-export class EmptyParameters extends createToolParameters(
-    z.object({})
-) {}
+export class EmptyParameters extends createToolParameters(z.object({})) {}
 
 export class TokenApprovalParameters extends createToolParameters(
     z.object({
         owner: z.string().describe("Address of the owner of the token"),
-        spender: z.string().describe("Address of the spender of the token, should usually be the periphery pool address"),
+        spender: z
+            .string()
+            .describe("Address of the spender of the token, should usually be the periphery pool address"),
         approvalAmount: z.number().describe("Amount of tokens to approve in bigint format, "),
         tokenAddress: z.string().describe("Address of the token to approve"),
-        chain: z.nativeEnum(CHAIN).describe("Chain to check for approval")
-    })
+        chain: z.nativeEnum(CHAIN).describe("Chain to check for approval"),
+    }),
 ) {}
 
 export class SetTokenApprovalParameters extends createToolParameters(
     z.object({
         target: z.string().describe("Address of the target contract"),
         callData: z.string().describe("Call data for the target contract"),
-        chain: z.nativeEnum(CHAIN).describe("Chain to check for approval")
-    })
+        chain: z.nativeEnum(CHAIN).describe("Chain to check for approval"),
+    }),
 ) {}

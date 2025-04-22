@@ -1,0 +1,5 @@
+mcp.example.json
+tsconfig.json
+package.json
+node_modules/*
+docs/*

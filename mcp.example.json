@@ -1,11 +1,11 @@
 {
     "skate-goat": {
-       "command": "node",
-       "args": ["/path/to/directory/skate-goat/build/evm.js"],
-       "env": {
-          "WALLET_PRIVATE_KEY": "...",
-          "RPC_PROVIDER_URL": "...",
-          "CHAIN": "..."
-       }
+        "command": "node",
+        "args": ["/path/to/directory/skate-goat/build/evm.js"],
+        "env": {
+            "WALLET_PRIVATE_KEY": "...",
+            "RPC_PROVIDER_URL": "...",
+            "CHAIN": "..."
+        }
     }
 }

@@ -1,17 +1,21 @@
 # Skate AMM Agent <> Goat SDK MCP Server
 
 ## Dependencies
+
 1. model context protocol
 2. goat sdk
 3. skate sdk
 
 ## Usage
+
 1. Install dependencies
+
 ```
 npm install
 ```
 
 2. Build Packages
+
 ```
 npm run build
 ```
@@ -20,8 +24,8 @@ npm run build
 
 4. Start running mcp server
 
-
 ## Environment Variables
+
 ```bash
 "WALLET_PRIVATE_KEY": "...",
 # Private key of the wallet to use for transactions
@@ -34,4 +38,5 @@ npm run build
 ```
 
 ## Demo
+
 ![demo-image](docs/images/skate-goat.png)

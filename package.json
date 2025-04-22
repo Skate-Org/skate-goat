@@ -1,29 +1,30 @@
 {
-  "type": "module",
-  "name": "skate-goat",
-  "version": "1.0.0",
-  "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "tsc --project tsconfig.json",
-    "start": "node build/evm.js",
-    "test-output": "tsc && node build/test.js"
-  },
-  "keywords": [],
-  "author": "0xkappayield",
-  "license": "ISC",
-  "description": "",
-  "devDependencies": {
-    "@types/node": "^22.14.0",
-    "typescript": "^5.8.3"
-  },
-  "dependencies": {
-    "@goat-sdk/adapter-model-context-protocol": "^0.2.11",
-    "@goat-sdk/wallet-viem": "^0.2.12",
-    "@modelcontextprotocol/sdk": "^1.9.0",
-    "@skate-org/skate-app-amm": "^1.2.4-p2",
-    "mcps-logger": "^1.0.0",
-    "viem": "^2.23.6",
-    "zod": "3.23.8"
-  }
+    "type": "module",
+    "name": "skate-goat",
+    "version": "1.0.0",
+    "main": "index.js",
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1",
+        "build": "tsc --project tsconfig.json",
+        "start": "node build/evm.js",
+        "test-output": "tsc && node build/test.js",
+        "format": "npx prettier --write ."
+    },
+    "keywords": [],
+    "author": "0xkappayield",
+    "license": "ISC",
+    "description": "",
+    "devDependencies": {
+        "@types/node": "^22.14.0",
+        "typescript": "^5.8.3"
+    },
+    "dependencies": {
+        "@goat-sdk/adapter-model-context-protocol": "^0.2.11",
+        "@goat-sdk/wallet-viem": "^0.2.12",
+        "@modelcontextprotocol/sdk": "^1.9.0",
+        "@skate-org/skate-app-amm": "^1.2.4-p2",
+        "mcps-logger": "^1.0.0",
+        "viem": "^2.23.6",
+        "zod": "3.23.8"
+    }
 }
