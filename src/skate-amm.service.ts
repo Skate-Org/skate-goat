@@ -52,7 +52,7 @@ export class SkateAmmService {
         description: "Retrieves all markets supported by the Skate AMM",
     })
     async getTradingPairs(parameters: EmptyParameters) {
-        const allPoolInfo = await getAllPoolInfo();
+        const allPoolInfo = await getAllPoolInfo("PRODUCTION");
         return allPoolInfo;
     }
 
