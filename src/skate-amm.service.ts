@@ -81,7 +81,7 @@ export class SkateAmmService {
             user: userAddress,
             recipient: userAddress,
             slippageLimit: slippageLimit,
-        });
+        },"PRODUCTION");
 
         if (!apiSwapQuote.success) {
             return apiSwapQuote.payload?.swapQuote.failedReason;
