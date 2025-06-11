@@ -9,6 +9,7 @@ import {
     SwapQuoteParameters,
     TokenApprovalParameters,
     UserWalletParameters,
+    ERC20BalanceParameters
 } from "./parameters.js";
 import {
     getAllPoolInfo,
@@ -19,7 +20,7 @@ import {
     PoolKey,
     apiGetSwapQuote,
 } from "@skate-org/skate-app-amm";
-import { createPublicClient, defineChain, http, parseUnits } from "viem";
+import { createPublicClient, defineChain, http, parseUnits, formatUnits } from "viem";
 import { giveMeSwapQuote } from "./test.js";
 import { getPublicClient, getWalletClient } from "./lib/multichain/client.js";
 
@@ -164,6 +165,55 @@ export class SkateAmmService {
         return {
             success: true,
             txHash: hash,
+        };
+    }
+
+    @Tool({
+        name: "get_ERC20_balance",
+        description:
+            "Returns the balance of an ERC20 token for a specific address, in decimal formatted, raw, and includes the raw decimals.",
+    })
+    async getERC20Balance(walletClient: ViemEVMWalletClient, parameters: ERC20BalanceParameters) {
+        const { tokenAddress, owner } = parameters;
+
+        const ERC20_ABI = [
+            {
+                type: "function",
+                name: "balanceOf",
+                stateMutability: "view",
+                inputs: [
+                    { name: "owner", type: "address" },
+                ],
+                outputs: [{ name: "", type: "uint256" }],
+            },
+            {
+                type: "function",
+                name: "decimals",
+                stateMutability: "view",
+                inputs: [],
+                outputs: [{ name: "", type: "uint8" }],
+              },
+        ];
+
+        const [rawBalance, rawDecimals] = await Promise.all([
+            walletClient.read({
+              address: tokenAddress,
+              abi: ERC20_ABI,
+              functionName: "balanceOf",
+              args: [owner],
+            }),
+            walletClient.read({
+              address: tokenAddress,
+              abi: ERC20_ABI,
+              functionName: "decimals",
+              args: [],
+            }),
+          ]);
+        
+        return {
+            formattedBalance: formatUnits(rawBalance.value, rawDecimals.value),
+            decimals: rawDecimals.value.toString(),
+            balance: rawBalance.value.toString(),
         };
     }
 }
