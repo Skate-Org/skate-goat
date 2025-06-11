@@ -10,7 +10,6 @@ import { privateKeyToAccount } from "viem/accounts";
 import { SkateAmmPluginFactory } from "./skate-amm.plugin.js";
 import { getDynamicChain } from "./lib/index.js";
 
-import "mcps-logger/console";
 
 // *********** Skate Specific Client Setup ***********
 // Select Chain for wallet client

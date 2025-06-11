@@ -50,3 +50,10 @@ export class SetTokenApprovalParameters extends createToolParameters(
         chain: z.nativeEnum(CHAIN).describe("Chain to check for approval"),
     }),
 ) {}
+
+export class ERC20BalanceParameters extends createToolParameters(
+    z.object({
+        tokenAddress: z.string().describe("Address of the token to check"),
+        owner: z.string().describe("Address of the owner of the token"),
+    }),
+){}
