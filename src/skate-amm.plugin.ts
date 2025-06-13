@@ -1,4 +1,4 @@
-import { EvmChain, PluginBase } from "@goat-sdk/core";
+import { PluginBase, Chain } from "@goat-sdk/core";
 import { SkateAmmService } from "./skate-amm.service.js";
 
 export class SkateAmmPlugin extends PluginBase {
@@ -6,7 +6,7 @@ export class SkateAmmPlugin extends PluginBase {
         super("SkateAmmPlugin", [new SkateAmmService()]);
     }
 
-    supportsChain = (chain: EvmChain) => true;
+    supportsChain = (chain: Chain) => true;
 }
 
 export function SkateAmmPluginFactory() {

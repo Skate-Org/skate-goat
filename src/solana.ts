@@ -1,40 +1,30 @@
-// @ts-nocheck
+import { solana } from "@goat-sdk/wallet-solana";
 import { getOnChainTools } from "@goat-sdk/adapter-model-context-protocol";
-import { viem } from "@goat-sdk/wallet-viem";
 import { Server } from "@modelcontextprotocol/sdk/server/index.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import { CallToolRequestSchema, ListToolsRequestSchema } from "@modelcontextprotocol/sdk/types.js";
-import { createWalletClient, http } from "viem";
-import { privateKeyToAccount } from "viem/accounts";
+import { Connection, Keypair } from "@solana/web3.js";
 
+import base58 from "bs58";
 import { SkateAmmPluginFactory } from "./skate-amm.plugin.js";
-import { getDynamicChain } from "./lib/index.js";
 
+// 1. Create the wallet client
+const connection = new Connection(process.env.RPC_PROVIDER_URL as string);
+const keypair = Keypair.fromSecretKey(base58.decode(process.env.WALLET_PRIVATE_KEY as string));
 
-// *********** Skate Specific Client Setup ***********
-// Select Chain for wallet client
-const chainId = process.env.CHAIN;
-const dynamicChain = getDynamicChain(chainId);
-
-// Create a wallet client
-const account = privateKeyToAccount(process.env.WALLET_PRIVATE_KEY as `0x${string}`);
-
-const walletClient = createWalletClient({
-    account: account,
-    transport: http(process.env.RPC_PROVIDER_URL as string),
-    chain: dynamicChain,
-});
-
-// Get the onchain tools for the wallet
+// 2. Get the onchain tools for the wallet
 const toolsPromise = getOnChainTools({
-    wallet: viem(walletClient),
+    wallet: solana({
+        keypair,
+        connection,
+    }),
     plugins: [SkateAmmPluginFactory()],
 });
 
-// Create server instance
+// 3. Create and configure the server
 const server = new Server(
     {
-        name: "goat-evm",
+        name: "goat-solana",
         version: "1.0.0",
     },
     {
@@ -56,7 +46,6 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
     try {
         return toolHandler(request.params.name, request.params.arguments);
     } catch (error) {
-        console.log(error);
         throw new Error(`Tool ${request.params.name} failed: ${error}`);
     }
 });
@@ -65,7 +54,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
 async function main() {
     const transport = new StdioServerTransport();
     await server.connect(transport);
-    console.error("Skate AMM (EVM) <> GOAT MCP Server running on stdio");
+    console.error("Skate AMM (SVM) <> GOAT MCP Server running on stdio");
 }
 
 main().catch((error) => {
