@@ -9,7 +9,8 @@ import {
     SwapQuoteParameters,
     TokenApprovalParameters,
     UserWalletParameters,
-    ERC20BalanceParameters
+    ERC20BalanceParameters,
+    SPLTokenBalanceParameters
 } from "./parameters.js";
 import {
     getAllPoolInfo,
@@ -24,6 +25,7 @@ import {
 import { createPublicClient, defineChain, http, parseUnits, formatUnits } from "viem";
 import { giveMeSwapQuote } from "./test.js";
 import { getPublicClient, getWalletClient } from "./lib/multichain/client.js";
+import { PublicKey } from "@solana/web3.js";
 
 const skateChain = defineChain({
     id: 5051,
@@ -115,7 +117,7 @@ export class SkateAmmService {
     @Tool({
         name: "skate_amm_execute_svm_swap",
         description:
-            "Gets a Skate AMM quote for a desired asset pair on a specific sourceChain. Executes a swap on SVM chain. Check for sufficient token approval before executing a swap.",
+            "Gets a Skate AMM quote for a desired asset pair on a specific sourceChain. Executes a swap on SVM chain.",
     })
     async executeSVMSwap(walletClient: SolanaWalletClient, parameters: SwapQuoteParameters) {
         const {
@@ -272,5 +274,20 @@ export class SkateAmmService {
             decimals: rawDecimals.value.toString(),
             balance: rawBalance.value.toString(),
         };
+    }
+
+    @Tool({
+        name: "get_SPL_token_balance",
+        description:
+            "Returns the balance of an SPL token for a specific address, in decimal formatted, raw, and includes the raw decimals. Only on EVM chains.",
+    })
+    async getSPLTokenBalance(walletClient: SolanaWalletClient, parameters: SPLTokenBalanceParameters) {
+        const { mintAddress, owner } = parameters;
+
+        const resp = await walletClient.getConnection().getParsedTokenAccountsByOwner(new PublicKey(owner), {
+            mint: new PublicKey(mintAddress),
+        },"processed");
+
+        return resp;
     }
 }
