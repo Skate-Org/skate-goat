@@ -23,6 +23,11 @@ npm run build
 3. Add `.mcp.example.json` to `.mcp.json`
 
 4. Start running mcp server
+```
+node build/evm.js
+OR
+node build/solana.js
+```
 
 ## Environment Variables
 
@@ -35,6 +40,7 @@ npm run build
 
 "CHAIN": "..."
 # Corresponding chain ID for the chain to use for transactions (e.g. 42161, 8453 etc.)
+# (Not required for SVM)
 ```
 
 ## Demo
