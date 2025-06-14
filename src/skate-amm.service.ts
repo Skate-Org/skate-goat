@@ -1,8 +1,8 @@
 // @ts-nocheck
 import { Tool } from "@goat-sdk/core";
 import { ViemEVMWalletClient } from "@goat-sdk/wallet-viem";
+import { SolanaKeypairWalletClient, SolanaWalletClient } from "@goat-sdk/wallet-solana";
 import {
-    CheckTokenApprovalParameters,
     EmptyParameters,
     KernelPoolParameters,
     SetTokenApprovalParameters,
@@ -16,9 +16,10 @@ import {
     getSlot0,
     getUserPositions,
     getSwapQuote,
-    KERNEL_POOL,
     PoolKey,
     apiGetSwapQuote,
+    skateAdapter,
+    ApiSwapQuoteResultSVM
 } from "@skate-org/skate-app-amm";
 import { createPublicClient, defineChain, http, parseUnits, formatUnits } from "viem";
 import { giveMeSwapQuote } from "./test.js";
@@ -49,7 +50,7 @@ const SkatePublicClient = createPublicClient({
 
 export class SkateAmmService {
     @Tool({
-        description: "Retrieves all markets supported by the Skate AMM",
+        description: "Retrieves all markets supported by the Skate AMM. Chain ID 901 is Solana, Chain ID 902 is Eclipse. The rest are EVM chains.",
     })
     async getTradingPairs(parameters: EmptyParameters) {
         const allPoolInfo = await getAllPoolInfo("PRODUCTION");
@@ -57,11 +58,11 @@ export class SkateAmmService {
     }
 
     @Tool({
-        name: "skate_amm_execute_swap",
+        name: "skate_amm_execute_evm_swap",
         description:
-            "Gets a Skate AMM quote for a desired asset pair on a specific sourceChain. Executes a swap. Check for sufficient token approval before executing a swap.",
+            "Gets a Skate AMM quote for a desired asset pair on a specific sourceChain. Executes a swap on EVM chain. Check for sufficient token approval before executing a swap.",
     })
-    async executeSwap(walletClient: ViemEVMWalletClient, parameters: SwapQuoteParameters) {
+    async executeEVMSwap(walletClient: ViemEVMWalletClient, parameters: SwapQuoteParameters) {
         const {
             amountIn,
             srcChainId,
@@ -112,9 +113,65 @@ export class SkateAmmService {
     }
 
     @Tool({
+        name: "skate_amm_execute_svm_swap",
+        description:
+            "Gets a Skate AMM quote for a desired asset pair on a specific sourceChain. Executes a swap on SVM chain. Check for sufficient token approval before executing a swap.",
+    })
+    async executeSVMSwap(walletClient: SolanaWalletClient, parameters: SwapQuoteParameters) {
+        const {
+            amountIn,
+            srcChainId,
+            tokenAddressIn,
+            tokenDecimalIn,
+            tokenAddressOut,
+            peripheryPoolAddress,
+            userAddress,
+            slippageLimit = 0.5,
+        } = parameters;
+
+        const apiSwapQuote = await apiGetSwapQuote({
+            amount: parseUnits(amountIn, tokenDecimalIn),
+            srcChainId: srcChainId,
+            tokenA: tokenAddressIn,
+            tokenB: tokenAddressOut,
+            recipient: userAddress,
+            user: userAddress,
+            slippageLimit: slippageLimit,
+        },"PRODUCTION");
+
+        if (!apiSwapQuote.success) {
+            return apiSwapQuote.payload?.swapQuote.failedReason;
+        }
+
+        if (!apiSwapQuote.payload?.swapQuote) {
+            return "Approval is still required...";
+        }
+
+        try {
+            // Execute swap with swapCall data
+            const hash = await walletClient.sendTransaction({
+                instructions: apiSwapQuote.payload?.swapInstructions,
+            });
+            const res = walletClient.getAddress();
+
+            return {
+                success: true,
+                quote: apiSwapQuote,
+                txHash: hash,
+            };
+        } catch (error) {
+            return {
+                success: false,
+                error: JSON.stringify(error, Object.getOwnPropertyNames(error)),
+                message: `Failed to execute swap: ${error.message || error}`,
+            };
+        }
+    }
+
+    @Tool({
         name: "skate_amm_check_approval",
         description:
-            "Returns the approval amounts of the owner & spender for a specified token. Must be checked before making a swap.",
+            "Returns the approval amounts of the owner & spender for a specified token. Must be checked before making a swap, Only on EVM chains.",
     })
     async checkTokenApproval(walletClient: ViemEVMWalletClient, parameters: TokenApprovalParameters) {
         const { owner, spender, approvalAmount, tokenAddress, chain } = parameters;
@@ -152,7 +209,7 @@ export class SkateAmmService {
     @Tool({
         name: "skate_amm_set_approval",
         description:
-            "Sets the approval amounts of the owner & spender for a specified token already checked and approval is insufficient for amount to swap.",
+            "Sets the approval amounts of the owner & spender for a specified token already checked and approval is insufficient for amount to swap. Only on EVM chains.",
     })
     async setTokenApproval(walletClient: ViemEVMWalletClient, parameters: SetTokenApprovalParameters) {
         const { target, callData } = parameters;
@@ -171,7 +228,7 @@ export class SkateAmmService {
     @Tool({
         name: "get_ERC20_balance",
         description:
-            "Returns the balance of an ERC20 token for a specific address, in decimal formatted, raw, and includes the raw decimals.",
+            "Returns the balance of an ERC20 token for a specific address, in decimal formatted, raw, and includes the raw decimals. Only on EVM chains.",
     })
     async getERC20Balance(walletClient: ViemEVMWalletClient, parameters: ERC20BalanceParameters) {
         const { tokenAddress, owner } = parameters;
