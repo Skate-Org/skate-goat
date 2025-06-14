@@ -7,6 +7,7 @@ import { Connection, Keypair } from "@solana/web3.js";
 
 import base58 from "bs58";
 import { SkateAmmPluginFactory } from "./skate-amm.plugin.js";
+import { splToken } from "@goat-sdk/plugin-spl-token";
 
 // 1. Create the wallet client
 const connection = new Connection(process.env.RPC_PROVIDER_URL as string);
@@ -18,7 +19,17 @@ const toolsPromise = getOnChainTools({
         keypair,
         connection,
     }),
-    plugins: [SkateAmmPluginFactory()],
+    plugins: [SkateAmmPluginFactory(), splToken({
+        "network": "mainnet",
+        "tokens": [
+            {
+                decimals: 9,
+                symbol: "SKATE",
+                name: "SKATE",
+                mintAddresses: {"mainnet": "9v6BKHg8WWKBPTGqLFQz87RxyaHHDygx8SnZEbBFmns2", "devnet": ""},
+            }
+        ]
+    })],
 });
 
 // 3. Create and configure the server
