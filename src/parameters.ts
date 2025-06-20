@@ -57,3 +57,10 @@ export class ERC20BalanceParameters extends createToolParameters(
         owner: z.string().describe("Address of the owner of the token"),
     }),
 ){}
+
+export class SPLTokenBalanceParameters extends createToolParameters(
+    z.object({
+        mintAddress: z.string().describe("Address of the token to check"),
+        owner: z.string().describe("Address of the owner of the token"),
+    }),
+){}
